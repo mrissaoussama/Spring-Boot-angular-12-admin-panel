@@ -1,0 +1,44 @@
+.invoice-title h2, .invoice-title h3 {
+  display: inline-block;
+}
+
+.table > tbody > tr > .no-line {
+  border-top: none;
+}
+
+.table > thead > tr > .no-line {
+  border-bottom: none;
+}
+
+.table > tbody > tr > .thick-line {
+  border-top: 2px solid;
+}
+.full-screen-modal {
+  max-width: unset !important;
+  width: 100%;
+  height: 100%;}
+
+    .mat-dialog-content {
+      max-height: unset !important;
+    }
+    #printPageButton {
+      display: none;
+    }
+    body > * {
+      display: none;
+    }
+    body > #dataToPrint{
+      display: block;
+    }
+    @media print {
+      #printPageButton {
+        display: none;
+      }
+      body > * {
+        display: none;
+      }
+      body > #dataToPrint{
+        display: block;
+      }
+    }
+
