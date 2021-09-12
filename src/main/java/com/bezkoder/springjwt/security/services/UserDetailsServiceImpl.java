@@ -17,7 +17,6 @@ import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.LoginRequest;
 import com.bezkoder.springjwt.payload.request.SignupRequest;
 import com.bezkoder.springjwt.payload.request.UpdateRequest;
-import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.payload.response.UserListResponse;
 import com.bezkoder.springjwt.payload.response.UserResponse;
@@ -113,7 +112,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     UserDetailsImpl userDetails = getUserDetails(loginRequest.getUsername(), loginRequest.getPassword());
     String jwt = getJwt(loginRequest.getUsername(), loginRequest.getPassword());
-    List<String> roles = getRoles(loginRequest.getUsername(), loginRequest.getPassword());
 
     user = userRepository.findById(userDetails.getId()).get();
     if (user.getStatus() == "Activation pending") {
@@ -200,7 +198,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     checkAdminOrConcernedUser(updateRequest.getUsername(), updateRequest.getPassword(), updateRequest.getId());
     UserDetailsImpl userDetails = getUserDetails(updateRequest.getUsername(), updateRequest.getPassword());
     String jwt = getJwt(updateRequest.getUsername(), updateRequest.getPassword());
-    List<String> roles = getRoles(updateRequest.getUsername(), updateRequest.getPassword());
     User user = userRepository.findById(userDetails.getId()).get();
 
     return ResponseEntity.ok(new UserResponse(jwt, user));
