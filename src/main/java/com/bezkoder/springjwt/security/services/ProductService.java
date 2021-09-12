@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,7 +54,8 @@ public class ProductService {
   CartItemRepository cartItemRepository;
   @Autowired
   UserDetailsServiceImpl userDetailsServiceImpl;
-
+  @Autowired
+  EmailSenderService emailSenderService;
   public ResponseEntity<?> findProduct(ProductRequest productRequest) {
     if (productRequest.getCategory() != null && productRequest.getName() != null) {
       return findByNameContainingAndCategory(productRequest);
@@ -200,7 +202,6 @@ public class ProductService {
 
   public ResponseEntity<?> deleteCategory(@Valid CategoryRequest categoryRequest) {
     userDetailsServiceImpl.checkAdmin(categoryRequest.getUsername(), categoryRequest.getPassword());
-    System.out.print(categoryRequest.getId());
     categoryRepository.deleteById(categoryRequest.getId());
     return ResponseEntity.ok(new MessageResponse("Category deleted successfully!"));
   }
@@ -269,8 +270,6 @@ public class ProductService {
     User user = userRepository.findByUsernameIgnoreCase(cartRequest.getUsername()).get();
     ShoppingCart shoppingCart = user.getShoppingcart();
     Product product = getProduct(cartRequest.getProductid());
-    System.out.println(shoppingCart.getId());
-    System.out.println(product.getId());
 
     CartItem cartItem = cartItemRepository.findByShoppingcartAndProduct(shoppingCart, product).get();
     shoppingCart.removeProduct(cartItem);
@@ -323,6 +322,13 @@ public class ProductService {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid date"));
     shoppingcart.setShippingdate(shoppingcartRequest.getShippingdate());
     shoppingcartRepository.save(shoppingcart);
+    //send email
+    SimpleMailMessage mailMessage = new SimpleMailMessage();
+    mailMessage.setTo(user.getEmail());
+    mailMessage.setSubject("Your order has been shipped!");
+    mailMessage.setFrom("mrissaoussama@gmail.com");
+    mailMessage.setText("hello "+user.getUsername()+", your order has been shipped");
+    emailSenderService.sendEmail(mailMessage);
     return ResponseEntity.ok(new ShoppingCartResponse(shoppingcart));
   }
 
@@ -345,6 +351,13 @@ public class ProductService {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid date"));
     shoppingcart.setCompleteddate(shoppingcartRequest.getCompleteddate());
     shoppingcartRepository.save(shoppingcart);
+     //send email
+     SimpleMailMessage mailMessage = new SimpleMailMessage();
+     mailMessage.setTo(user.getEmail());
+     mailMessage.setSubject("Your order has been completed!");
+     mailMessage.setFrom("mrissaoussama@gmail.com");
+     mailMessage.setText("hello "+user.getUsername()+", your order has been completed");
+     emailSenderService.sendEmail(mailMessage);
     return ResponseEntity.ok(new ShoppingCartResponse(shoppingcart));
   }
 

@@ -117,8 +117,8 @@
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
               <td mat-cell *matCellDef="let product">
-                <button (click)="openDialog(product)">Edit</button>
-                <button (click)="deleteProduct(product,$event)">Delete</button>
+                <button  mat-button (click)="openDialog(product)">Edit</button>
+                <button  mat-button (click)="deleteProduct(product,$event)">Delete</button>
 
               </td>
             </ng-container>
@@ -166,8 +166,8 @@
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
               <td mat-cell *matCellDef="let category">
-                <button (click)="opencategorydialog(category)">Edit</button>
-                <button (click)="deleteCategory(category,$event)">Delete</button>
+                <button  mat-button  (click)="opencategorydialog(category)">Edit</button>
+                <button  mat-button (click)="deleteCategory(category,$event)">Delete</button>
 
               </td>
             </ng-container>

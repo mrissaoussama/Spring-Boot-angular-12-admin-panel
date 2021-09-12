@@ -150,7 +150,6 @@ public class ProductController {
 
   @PostMapping("/updateShoppingCartItems")
   public ResponseEntity<?> updateShoppingCartItems(@Valid @RequestBody CartItemRequest cartItemRequest) {
-    System.out.print(cartItemRequest.toString());
     return productService.updateShoppingCartItems(cartItemRequest);
   }
 

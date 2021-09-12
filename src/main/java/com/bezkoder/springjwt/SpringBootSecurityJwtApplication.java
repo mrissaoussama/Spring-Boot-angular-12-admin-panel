@@ -8,10 +8,12 @@ import com.bezkoder.springjwt.models.ERole;
 import com.bezkoder.springjwt.models.Product;
 import com.bezkoder.springjwt.models.Role;
 import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.payload.request.CartRequest;
 import com.bezkoder.springjwt.repository.CategoryRepository;
 import com.bezkoder.springjwt.repository.ProductRepository;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
+import com.bezkoder.springjwt.security.services.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -52,7 +54,7 @@ public class SpringBootSecurityJwtApplication {
 
   @Bean
   CommandLineRunner init(RoleRepository RoleRepository, UserRepository userRepository,
-      ProductRepository productRepository, CategoryRepository categoryRepository) {
+      ProductRepository productRepository, CategoryRepository categoryRepository,ProductService productService) {
     return args -> {
       Role r1 = new Role(ERole.ROLE_ADMIN);
       Role r2 = new Role(ERole.ROLE_MODERATOR);
@@ -66,6 +68,7 @@ public class SpringBootSecurityJwtApplication {
       r.add(r2);
       r.add(r3);
       User user = new User("mod", "mrissaoussama@gmail.com", encoder.encode("123456"), r);
+      user.setName("name");
       user.setStatus("Activated");
       userRepository.save(user);
       RoleRepository.findAll().forEach(System.out::println);
@@ -85,6 +88,10 @@ public class SpringBootSecurityJwtApplication {
       productRepository.save(product1);
       productRepository.save(product2);
       productRepository.save(product3);
+      CartRequest cartRequest=new CartRequest("mod","123456",1L,1,5);
+
+      productService.addToCart(cartRequest);
+
 
     };
 

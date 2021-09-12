@@ -21,7 +21,8 @@ export class LoginComponent implements OnInit {
   tokenavailable: Boolean = false;
   tokenmessage: String;
   user: User;
-  constructor(private authService: AuthService, private activatedRoute: ActivatedRoute, private tokenStorage: TokenStorageService, private router: Router) { }
+  constructor(private authService: AuthService, private activatedRoute: ActivatedRoute,
+     private tokenStorage: TokenStorageService, private router: Router) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params: Params) => {
@@ -43,6 +44,9 @@ export class LoginComponent implements OnInit {
       this.roles = this.tokenStorage.getUser().roles;
 
     }
+if(this.tokenStorage.getUser()!=null)
+    this.router.navigate(['/user-profile']);
+
   }
 
   onSubmit(): void {

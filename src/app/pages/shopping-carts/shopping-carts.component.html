@@ -149,10 +149,10 @@
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
               <td mat-cell *matCellDef="let shoppingcart">
-                <button (click)="viewshoppingcart(shoppingcart,$event)">View</button>
-                <button (click)="editshoppingcart(shoppingcart,$event)">Edit</button>
-                <button *ngIf="shoppingcart.shippingdate==null" (click)="shipcart(shoppingcart)">Ship</button>
-                <button *ngIf="shoppingcart.completeddate==null && shoppingcart.shippingdate!=null"
+                <button mat-button  (click)="viewshoppingcart(shoppingcart,$event)">View</button>
+                <button mat-button  (click)="editshoppingcart(shoppingcart,$event)">Edit</button>
+                <button mat-button  *ngIf="shoppingcart.shippingdate==null" (click)="shipcart(shoppingcart)">Ship</button>
+                <button mat-button  *ngIf="shoppingcart.completeddate==null && shoppingcart.shippingdate!=null"
                   (click)="completecart(shoppingcart)">Complete</button>
 
               </td>

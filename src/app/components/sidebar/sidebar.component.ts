@@ -56,7 +56,8 @@ export class SidebarComponent implements OnInit {
   logout(): void {
     this.islogged = false;
     this.tokenStorage.signOut();
+      window.location.reload;
+
     this.router.navigate(['/login']);
-    window.location.reload;
   }
 }
