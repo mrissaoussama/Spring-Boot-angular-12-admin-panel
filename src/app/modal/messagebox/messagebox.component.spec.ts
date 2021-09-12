@@ -8,9 +8,9 @@ describe('MessageboxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MessageboxComponent ]
+      declarations: [MessageboxComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

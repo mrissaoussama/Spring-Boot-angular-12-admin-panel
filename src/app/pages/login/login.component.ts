@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Role } from 'src/app/models/role.model';
+import { User } from 'src/app/models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
-import { ActivatedRoute, Params} from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -16,24 +17,26 @@ export class LoginComponent implements OnInit {
   isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
-  roles: string[] = [];
-tokenavailable:Boolean=false;
-tokenmessage:String;
-  constructor(private authService: AuthService,private activatedRoute: ActivatedRoute, private tokenStorage: TokenStorageService,private router: Router) { }
+  roles: Role[] = [];
+  tokenavailable: Boolean = false;
+  tokenmessage: String;
+  user: User;
+  constructor(private authService: AuthService, private activatedRoute: ActivatedRoute, private tokenStorage: TokenStorageService, private router: Router) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params: Params) => {
-      if (params['token']!=undefined)
-      this.authService.confirmUserAccount(params['token']).subscribe(
+      if (params['token'] != undefined)
+        this.authService.confirmUserAccount(params['token']).subscribe(
 
-        data=>{
-this.tokenavailable=true;
-this.tokenmessage=data.message;
-        },
-        err=>{
-        this.tokenavailable=true;
-this.tokenmessage=err.error.message;}
-      )
+          data => {
+            this.tokenavailable = true;
+            this.tokenmessage = data.message;
+          },
+          err => {
+            this.tokenavailable = true;
+            this.tokenmessage = err.error.message;
+          }
+        )
     });
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
@@ -44,13 +47,15 @@ this.tokenmessage=err.error.message;}
 
   onSubmit(): void {
     const { username, password } = this.form;
-this.tokenmessage="";
+
+    this.tokenmessage = "";
     this.authService.login(username, password).subscribe(
       data => {
         this.tokenStorage.saveToken(data.accessToken);
-        this.tokenStorage.saveUser(data);
-        console.log("data");
-        console.log(data);
+        this.user = data.user;
+        this.user.password = password;
+        this.tokenStorage.saveUser(this.user);
+
 
         this.isLoginFailed = false;
         this.isLoggedIn = true;

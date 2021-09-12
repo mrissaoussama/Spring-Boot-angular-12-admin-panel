@@ -1,26 +1,28 @@
 <h1 mat-dialog-title>modify product</h1>
 <div mat-dialog-content>
-    <mat-form-field>
-        <input matInput (change)="validate(data)" [(ngModel)]="data.name" cdkFocusInitial required> </mat-form-field>
-    <mat-form-field>
-        <input matInput (change)="validate(data)" [(ngModel)]="data.price" required>
-    </mat-form-field>
-    <mat-form-field>
-        <textarea matInput (change)="validate(data)" [(ngModel)]="data.description" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="5" cdkAutosizeMaxRows="20"></textarea>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>Select Category</mat-label>
-        <mat-select [(ngModel)]="data.category.id">
+  <mat-form-field>
+    <input matInput (change)="validate(data)" [(ngModel)]="data.name" cdkFocusInitial required>
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput (change)="validate(data)" [(ngModel)]="data.price" required>
+  </mat-form-field>
+  <mat-form-field>
+    <textarea matInput (change)="validate(data)" [(ngModel)]="data.description" cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="5" cdkAutosizeMaxRows="20"></textarea>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Select Category</mat-label>
+    <mat-select [(ngModel)]="data.category.id">
 
-            <mat-option *ngFor="let category of categories" [value]="category.id" required>
-                {{category.name}}
-            </mat-option>
-        </mat-select>
+      <mat-option *ngFor="let category of categories" [value]="category.id" required>
+        {{category.name}}
+      </mat-option>
+    </mat-select>
 
-    </mat-form-field>
+  </mat-form-field>
 </div>
 <p *ngIf="errors!=''" style="color:red;">{{errors}}</p>
 <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">Cancel</button>
-    <button *ngIf="validate(data)" mat-button [mat-dialog-close]="data" >Ok</button>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button *ngIf="validate(data)" mat-button [mat-dialog-close]="data">Ok</button>
 </div>

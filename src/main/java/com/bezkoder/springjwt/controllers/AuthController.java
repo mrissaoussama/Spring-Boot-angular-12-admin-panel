@@ -25,18 +25,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-@Autowired
-UserDetailsServiceImpl userDetailsServiceImpl;
-  @PostMapping("/getallusers")
-  public ResponseEntity<?> getallusers(@Valid @RequestBody LoginRequest loginRequest) {
-return userDetailsServiceImpl.getallusers(loginRequest);
+  @Autowired
+  UserDetailsServiceImpl userDetailsServiceImpl;
+
+  @PostMapping("/getAllUsers")
+  public ResponseEntity<?> getAllUsers(@Valid @RequestBody LoginRequest loginRequest) {
+    return userDetailsServiceImpl.getAllUsers(loginRequest);
 
   }
 
-  @PostMapping("/deleteuser")
+  @PostMapping("/deleteUser")
   public ResponseEntity<?> deleteUser(@Valid @RequestBody UpdateRequest updateRequest) {
 
-   return userDetailsServiceImpl.deleteUser(updateRequest);
+    return userDetailsServiceImpl.deleteUser(updateRequest);
   }
 
   @PostMapping("/login")
@@ -53,10 +54,10 @@ return userDetailsServiceImpl.getallusers(loginRequest);
 
   @GetMapping("/user-profile")
   public ResponseEntity<?> getUserInfo(@Valid @RequestBody UpdateRequest updateRequest) {
-return userDetailsServiceImpl.getUserInfo(updateRequest);
+    return userDetailsServiceImpl.getUserInfo(updateRequest);
   }
 
-  @RequestMapping("/updateprofileimage")
+  @RequestMapping("/updateProfileImage")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseBody
   public ResponseEntity<?> updateUserProfilePicture(@RequestPart("image") MultipartFile image,
@@ -64,15 +65,14 @@ return userDetailsServiceImpl.getUserInfo(updateRequest);
 
     return userDetailsServiceImpl.updateUserProfilePicture(image, username, password);
 
-
   }
 
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-   return userDetailsServiceImpl.registerUser(signUpRequest);
+    return userDetailsServiceImpl.registerUser(signUpRequest);
   }
 
-  @GetMapping("/confirmuseraccount")
+  @GetMapping("/confirmUserAccount")
   public ResponseEntity<?> confirmUserAccount(@RequestParam("token") String confirmationToken) {
     return userDetailsServiceImpl.confirmUserAccount(confirmationToken);
   }

@@ -19,6 +19,7 @@ import com.bezkoder.springjwt.payload.request.SignupRequest;
 import com.bezkoder.springjwt.payload.request.UpdateRequest;
 import com.bezkoder.springjwt.payload.response.JwtResponse;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
+import com.bezkoder.springjwt.payload.response.UserListResponse;
 import com.bezkoder.springjwt.payload.response.UserResponse;
 import com.bezkoder.springjwt.repository.ConfirmationTokenRepository;
 import com.bezkoder.springjwt.repository.RoleRepository;
@@ -76,30 +77,25 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   }
 
-  public ResponseEntity<?> getallusers(LoginRequest loginRequest) {
+  public ResponseEntity<?> getAllUsers(LoginRequest loginRequest) {
+    checkAdmin(loginRequest.getUsername(), loginRequest.getPassword());
 
-    Authentication authentication = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-        .collect(Collectors.toList());
+    String jwt = getJwt(loginRequest.getUsername(), loginRequest.getPassword());
+    List<String> roles = getRoles(loginRequest.getUsername(), loginRequest.getPassword());
+
     if (roles.contains("ROLE_ADMIN")) {
-      return ResponseEntity.ok(new UserResponse(jwt, userRepository.findAll()));
+      return ResponseEntity.ok(new UserListResponse(jwt, userRepository.findAll()));
     } else {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Unauthorized access"));
     }
   }
 
   public ResponseEntity<?> deleteUser(UpdateRequest updateRequest) {
+    checkAdminOrConcernedUser(updateRequest.getUsername(), updateRequest.getPassword(), updateRequest.getId());
 
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-        .collect(Collectors.toList());
+    UserDetailsImpl userDetails = getUserDetails(updateRequest.getUsername(), updateRequest.getPassword());
+    List<String> roles = getRoles(updateRequest.getUsername(), updateRequest.getPassword());
+
     if (roles.contains("ROLE_ADMIN") || updateRequest.getId() == userDetails.getId()) {
       userRepository.deleteById(updateRequest.getId());
       return ResponseEntity.ok(new MessageResponse("User deleted"));
@@ -109,38 +105,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   }
 
   public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
-    User user = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername());
-    if (user==null||user.getStatus()=="Deleted")
-    return ResponseEntity.badRequest().body(new MessageResponse("Error:Account does not exist"));
-    if (user.getStatus()=="Banned")
-    return ResponseEntity.badRequest().body(new MessageResponse("Error:Account Banned"));
+    User user = userRepository.findByUsernameIgnoreCase(loginRequest.getUsername()).get();
+    if (user == null || user.getStatus() == "Deleted")
+      return ResponseEntity.badRequest().body(new MessageResponse("Error:Account does not exist"));
+    if (user.getStatus() == "Banned")
+      return ResponseEntity.badRequest().body(new MessageResponse("Error:Account Banned"));
 
-    Authentication authentication = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-        .collect(Collectors.toList());
-     user = userRepository.findById(userDetails.getId()).get();
-    if (user.getStatus() == "Activation pending")
-    {SignupRequest signupRequest=new SignupRequest();
+    UserDetailsImpl userDetails = getUserDetails(loginRequest.getUsername(), loginRequest.getPassword());
+    String jwt = getJwt(loginRequest.getUsername(), loginRequest.getPassword());
+    List<String> roles = getRoles(loginRequest.getUsername(), loginRequest.getPassword());
+
+    user = userRepository.findById(userDetails.getId()).get();
+    if (user.getStatus() == "Activation pending") {
+      SignupRequest signupRequest = new SignupRequest();
       signupRequest.setUsername(loginRequest.getUsername());
       signupRequest.setPassword(loginRequest.getPassword());
       this.sendNewConfirmationToken(signupRequest);
-    return ResponseEntity.badRequest().body(new MessageResponse("Error: Account not verified, please check your email for a new activation link"));
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse("Error: Account not verified, please check your email for a new activation link"));
     }
 
     if (user.getStatus() != "Activated")
       return ResponseEntity.badRequest().body(new MessageResponse("Error: please verify your account"));
 
-    return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), userDetails.getPassword(),
-        user.getEmail(), user.getAge(), user.getName(), user.getSurname(), user.getAddress(), user.getCity(),
-        user.getCountry(), user.getJob(), user.getDescription(), user.isImage(), roles));
+    return ResponseEntity.ok(new UserResponse(jwt, user));
   }
 
   public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
-
 
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
@@ -148,8 +139,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
     }
-    if(signUpRequest.getPassword().length()<6)
-    return ResponseEntity.badRequest().body(new MessageResponse("Error: Password must not be empty or less than 6 characters"));
+    if (signUpRequest.getPassword().length() < 6)
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse("Error: Password must not be empty or less than 6 characters"));
 
     User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
         encoder.encode(signUpRequest.getPassword()));
@@ -164,7 +156,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   }
 
   public ResponseEntity<?> sendNewConfirmationToken(SignupRequest signUpRequest) {
-    User user = userRepository.findByUsernameIgnoreCase(signUpRequest.getUsername());
+    User user = userRepository.findByUsernameIgnoreCase(signUpRequest.getUsername()).get();
     if (user == null)
       return ResponseEntity.badRequest().body(new MessageResponse("Error: user does not exist"));
     ConfirmationToken token = confirmationTokenRepository.findByUser(user);
@@ -176,11 +168,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     mailMessage.setTo(user.getEmail());
     mailMessage.setSubject("Complete Registration!");
     mailMessage.setFrom("mrissaoussama@gmail.com");
-    mailMessage.setText("To activate your account, please click here : "
-        + "http://localhost:4200/#/login?token=" + confirmationToken.getConfirmationToken());
+    mailMessage.setText("To activate your account, please click here : " + "http://localhost:4200/#/login?token="
+        + confirmationToken.getConfirmationToken());
     emailSenderService.sendEmail(mailMessage);
 
-    return ResponseEntity.ok(new MessageResponse("verification link sent, please check your email to activate your account"));
+    return ResponseEntity
+        .ok(new MessageResponse("verification link sent, please check your email to activate your account"));
 
   }
 
@@ -200,43 +193,31 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       confirmationTokenRepository.deleteById(token.getId());
       return ResponseEntity.ok(new MessageResponse("Account Activated"));
     }
-
     return ResponseEntity.badRequest().body(new MessageResponse("Error Activating Account"));
   }
 
   public ResponseEntity<?> getUserInfo(UpdateRequest updateRequest) {
-
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-        .collect(Collectors.toList());
+    checkAdminOrConcernedUser(updateRequest.getUsername(), updateRequest.getPassword(), updateRequest.getId());
+    UserDetailsImpl userDetails = getUserDetails(updateRequest.getUsername(), updateRequest.getPassword());
+    String jwt = getJwt(updateRequest.getUsername(), updateRequest.getPassword());
+    List<String> roles = getRoles(updateRequest.getUsername(), updateRequest.getPassword());
     User user = userRepository.findById(userDetails.getId()).get();
 
-    return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), userDetails.getPassword(),
-        user.getEmail(), user.getAge(), user.getName(), user.getSurname(), user.getAddress(), user.getCity(),
-        user.getCountry(), user.getJob(), user.getDescription(), user.isImage(), roles, "user updated"));
+    return ResponseEntity.ok(new UserResponse(jwt, user));
+
   }
 
   public ResponseEntity<?> updateUser(UpdateRequest updateRequest) {
-
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getPassword()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-        .collect(Collectors.toList());
+    checkAdminOrConcernedUser(updateRequest.getUsername(), updateRequest.getPassword(), updateRequest.getId());
+    UserDetailsImpl userDetails = getUserDetails(updateRequest.getUsername(), updateRequest.getPassword());
+    String jwt = getJwt(updateRequest.getUsername(), updateRequest.getPassword());
     User user = userDetailsServiceImpl.saveUser(userDetails.getId(), updateRequest);
-    return ResponseEntity.ok(new JwtResponse(jwt, user.getId(), user.getUsername(), userDetails.getPassword(),
-        user.getEmail(), user.getAge(), user.getName(), user.getSurname(), user.getAddress(), user.getCity(),
-        user.getCountry(), user.getJob(), user.getDescription(), user.isImage(), roles, "user updated"));
+    return ResponseEntity.ok(new UserResponse(jwt, user));
+
   }
 
   public User saveUser(long id, UpdateRequest updateRequest) {
-
+    userDetailsServiceImpl.checkAdminOrConcernedUser(updateRequest.getUsername(), updateRequest.getPassword(), id);
     User user = userRepository.findById(id).get();
     if (updateRequest.getEmail() != null)
       user.setEmail(updateRequest.getEmail());
@@ -272,12 +253,55 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   public ResponseEntity<?> updateUserProfilePicture(MultipartFile image, String username, String password) {
 
-    Authentication authentication = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    UserDetailsImpl userDetails = getUserDetails(username, password);
     this.saveUserProfileImage(userDetails.getId(), image);
     return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
   }
 
+  public Authentication isAuthenticated(String username, String password) {
+    Authentication authentication = authenticationManager
+        .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    return authentication;
+  }
+
+  public UserDetailsImpl getUserDetails(String username, String password) {
+    Authentication authentication = isAuthenticated(username, password);
+    return (UserDetailsImpl) authentication.getPrincipal();
+  }
+
+  public List<String> getRoles(String username, String password) {
+    UserDetailsImpl userDetails = getUserDetails(username, password);
+    return userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
+  }
+
+  private String getJwt(String username, String password) {
+    Authentication authentication = isAuthenticated(username, password);
+    return jwtUtils.generateJwtToken(authentication);
+  }
+
+  public boolean isAdmin(String username, String password) {
+    return userDetailsServiceImpl.getRoles(username, password).contains(("ROLE_ADMIN"));
+  }
+
+  public ResponseEntity<?> notAuthorizedError() {
+    return ResponseEntity.badRequest().body(new MessageResponse("Error: Unauthorized"));
+  }
+
+  public ResponseEntity<?> userNotFound() {
+    return ResponseEntity.badRequest().body(new MessageResponse("Error: User not found."));
+  }
+
+  public void checkAdmin(String username, String password) {
+    if (!isAdmin(username, password))
+      notAuthorizedError();
+  }
+
+  public void checkAdminOrConcernedUser(String username, String password, Long userid) {
+    User user = userRepository.getOne(userid);
+    if (user == null)
+      userNotFound();
+    if (!isAdmin(username, password) || user.getId() != userid)
+      notAuthorizedError();
+  }
 }

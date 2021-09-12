@@ -11,13 +11,13 @@ import { UserProfileComponent } from './pages/user-profile/user-profile.componen
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatDialogModule} from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MatInputModule} from "@angular/material/input";
-import {MatPaginatorModule } from "@angular/material/paginator";
+import { MatInputModule } from "@angular/material/input";
+import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatTableModule } from "@angular/material/table";
-import {MatSortModule } from "@angular/material/sort";
+import { MatSortModule } from "@angular/material/sort";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { AppRoutingModule } from './app.routing';
 import { ComponentsModule } from './components/components.module';
@@ -28,6 +28,7 @@ import { MessageboxComponent } from './modal/messagebox/messagebox.component';
 import { UsersComponent } from './pages/users/users.component';
 import { ShoppingCartsComponent } from './pages/shopping-carts/shopping-carts.component';
 import { InvoiceComponent } from './modal/invoice/invoice.component';
+import { EditshoppingcartComponent } from './modal/editshoppingcart/editshoppingcart.component';
 
 @NgModule({
   imports: [
@@ -39,7 +40,7 @@ import { InvoiceComponent } from './modal/invoice/invoice.component';
     NgbModule,
     RouterModule,
     AppRoutingModule,
-    MatSelectModule ,
+    MatSelectModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
@@ -60,7 +61,8 @@ import { InvoiceComponent } from './modal/invoice/invoice.component';
     MessageboxComponent,
     UsersComponent,
     ShoppingCartsComponent,
-    InvoiceComponent
+    InvoiceComponent,
+    EditshoppingcartComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,3 +1,4 @@
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -10,65 +11,61 @@ const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 const HttpUploadOptions = {
-  headers: new HttpHeaders({ })
+  headers: new HttpHeaders({})
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  deleteuser(user: User) {
-    var username="mod";
-    var password="123456";
-    var id=user.id;
-    return this.http.post(AUTH_API + 'getallusers',{username,password,id});
-    }
-    confirmUserAccount(token:string): Observable<any>
-    {let headers = new Headers();
-      headers.append('Content-Type', 'application/json');
-      let params = new HttpParams().set("token",token);
-      return this.http.get<string>(AUTH_API + 'confirmuseraccount' ,{params: params});
+  constructor(private http: HttpClient, private token: TokenStorageService) { }
+  deleteUser(user: User) {
+    var username = this.token.getUsername();
+    var password = this.token.getPassword();
+    var id = user.id;
+    return this.http.post(AUTH_API + 'getAllUsers', { username, password, id });
+  }
+  confirmUserAccount(token: string): Observable<any> {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    let params = new HttpParams().set("token", token);
+    return this.http.get<string>(AUTH_API + 'confirmuseraccount', { params: params });
 
-    }
-  getallusers() : Observable<any> {
-    var username="mod";
-    var password="123456"
-    return this.http.post(AUTH_API + 'getallusers',{username,password});
-    }
+  }
+  getAllUsers(): Observable<any> {
+    var username = this.token.getUsername();
+    var password = this.token.getPassword();
+    return this.http.post(AUTH_API + 'getAllUsers', { username, password });
+  }
 
-  constructor(private http: HttpClient) { }
+  updateProfile(id: any, username: string, form: FormGroup): Observable<any> {
 
-  update(id: any, username,form: FormGroup) : Observable<any> {
+    var username = this.token.getUsername();
+    var password = this.token.getPassword();
+    var newpassword = form.get('password').value;
+    var name = form.get('name').value;
+    var age = form.get('age').value;
+    var surname = form.get('surname').value;
+    var address = form.get('address').value;
+    var city = form.get('city').value;
+    var country = form.get('country').value;
+    var job = form.get('job').value;
+    var description = form.get('description').value;
 
+    return this.http.post(AUTH_API + 'user-profile', {
+      id,
+      username, password
+      , name
+      , age, surname, address, city, country, job, description
 
-    var password=form.get('password').value;
-    var name=form.get('name').value;
-    var age=form.get('age').value;
-    var surname=form.get('surname').value;
-    var address=form.get('address').value;
-   var city=form.get('city').value;
-    var country=form.get('country').value;
-var job=form.get('job').value;
- var description=form.get('description').value;
+    }, httpOptions);
+  }
 
-    //  var username="mod";
-    //  var password="123456";
-    //  var email="mrissaoussama@gmail.com";
-
-
-
-
-    return this.http.post(AUTH_API + 'user-profile', {id,
-     username,password
-     ,name
-     ,age,surname,address,city,country,job,description
-
-    }, httpOptions);  }
-
-    updateprofileimage(form: FormData) : Observable<any> {
+  updateProfileImage(form: FormData): Observable<any> {
 
 
-      return this.http.post(AUTH_API + 'updateprofileimage', form);  }
+    return this.http.post(AUTH_API + 'updateProfileImage', form);
+  }
 
   login(username: string, password: string): Observable<any> {
     return this.http.post(AUTH_API + 'login', {

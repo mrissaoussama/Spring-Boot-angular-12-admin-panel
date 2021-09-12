@@ -1,4 +1,5 @@
-<div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url(assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
+<div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+    style="min-height: 600px; background-image: url(assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
     <!-- Mask -->
     <span class="mask bg-gradient-danger opacity-8"></span>
     <!-- Header container -->
@@ -7,7 +8,8 @@
             <div class="col-lg-7 col-md-10">
                 <h1 class="display-2 text-white">Hello {{ currentUser.username }}
                 </h1>
-                <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made with your work and manage your projects or assigned tasks</p>
+                <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made with
+                    your work and manage your projects or assigned tasks</p>
             </div>
         </div>
     </div>
@@ -19,11 +21,13 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-3 order-lg-2">
                         <div class="card-profile-image">
-                            <form *ngIf="!isSuccessful" [formGroup]="imageForm" enctype='multipart/form-data' (ngSubmit)=" update()" novalidate>
+                            <form *ngIf="!isSuccessful" [formGroup]="imageForm" enctype='multipart/form-data'
+                                (ngSubmit)=" update()" novalidate>
                                 <label>
-                                <img [src]=profileimg class="rounded-circle" >
-                                <input type="file" (change)="onFileChanged($event)" style="display: none;" accept="image/png, image/jpeg" class="btn btn-sm btn-info mr-4">
-                            </label>
+                                    <img [src]=profileimg class="rounded-circle">
+                                    <input type="file" (change)="onFileChanged($event)" style="display: none;"
+                                        accept="image/png, image/jpeg" class="btn btn-sm btn-info mr-4">
+                                </label>
                             </form>
 
                         </div>
@@ -32,7 +36,7 @@
 
                 <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
                     <div class="d-flex justify-content-between">
-                      <!-- //message -->
+                        <!-- //message -->
                     </div>
 
                 </div>
@@ -85,7 +89,7 @@
                 </div>
                 <div class="card-body">
                     <form *ngIf="!isSuccessful" [formGroup]="profileForm" (ngSubmit)=" onSubmit()" novalidate>
-                            <input type="submit" class="btn btn-sm btn-primary" value="Save">
+                        <input type="submit" class="btn btn-sm btn-primary" value="Save">
 
                         <div *ngIf="f.invalid">
                             please fill in the required fields.
@@ -99,8 +103,11 @@
 
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-password">Password*</label>
-                                        <input type="password" id="input-password" minlength="6" formControlName="password" class="form-control form-control-alternative" placeholder="password">
-                                        <div *ngIf="f.password.invalid && (f.password.dirty || f.password.touched)" class="alert alert-danger">
+                                        <input type="password" id="input-password" minlength="6"
+                                            formControlName="password" class="form-control form-control-alternative"
+                                            placeholder="password">
+                                        <div *ngIf="f.password.invalid && (f.password.dirty || f.password.touched)"
+                                            class="alert alert-danger">
 
                                             <div *ngIf="f.password.errors?.required">
                                                 password is required to update profile.
@@ -122,25 +129,29 @@
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-first-name">First name</label>
 
-                                        <input type="text" id="input-first-name" formControlName="name" class="form-control form-control-alternative" placeholder="First name">
+                                        <input type="text" id="input-first-name" formControlName="name"
+                                            class="form-control form-control-alternative" placeholder="First name">
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-last-name">Last name</label>
-                                        <input type="text" id="input-last-name" formControlName="surname" class="form-control form-control-alternative" placeholder="Last name">
+                                        <input type="text" id="input-last-name" formControlName="surname"
+                                            class="form-control form-control-alternative" placeholder="Last name">
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-last-name">Job</label>
-                                        <input type="text" id="input-job" formControlName="job" class="form-control form-control-alternative" placeholder="Last name">
+                                        <input type="text" id="input-job" formControlName="job"
+                                            class="form-control form-control-alternative" placeholder="Last name">
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-last-name">Age</label>
-                                        <input type="text" id="input-age" formControlName="age" class="form-control form-control-alternative" placeholder="Last name">
+                                        <input type="text" id="input-age" formControlName="age"
+                                            class="form-control form-control-alternative" placeholder="Last name">
                                     </div>
                                 </div>
                             </div>
@@ -153,7 +164,9 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-address">Address</label>
-                                        <input id="input-address" formControlName="address" class="form-control form-control-alternative" placeholder="Home Address" type="text">
+                                        <input id="input-address" formControlName="address"
+                                            class="form-control form-control-alternative" placeholder="Home Address"
+                                            type="text">
                                     </div>
                                 </div>
                             </div>
@@ -161,13 +174,15 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-city">City</label>
-                                        <input type="text" id="input-city" formControlName="city" class="form-control form-control-alternative">
+                                        <input type="text" id="input-city" formControlName="city"
+                                            class="form-control form-control-alternative">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label class="form-control-label" for="input-country">Country</label>
-                                        <input type="text" id="input-country" formControlName="country" class="form-control form-control-alternative" placeholder="Country">
+                                        <input type="text" id="input-country" formControlName="country"
+                                            class="form-control form-control-alternative" placeholder="Country">
                                     </div>
                                 </div>
 
@@ -179,7 +194,9 @@
                         <div class="pl-lg-4">
                             <div class="form-group">
                                 <label>About Me</label>
-                                <textarea rows="4" formControlName="description" class="form-control form-control-alternative" placeholder="A few words about you ..."></textarea>
+                                <textarea rows="4" formControlName="description"
+                                    class="form-control form-control-alternative"
+                                    placeholder="A few words about you ..."></textarea>
                             </div>
                         </div>
                     </form>

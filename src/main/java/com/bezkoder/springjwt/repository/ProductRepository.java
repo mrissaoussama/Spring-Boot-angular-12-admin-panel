@@ -13,18 +13,24 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-	Optional<Product> findByName(String name);
-	List<Product> findByNameContaining(String name);
-  Page<Product> findByNameContaining(String name,Pageable pageable);
-	List<Product> findAllByPrice(double price);
-  Page<Product> findAllByPrice(double price,Pageable pageable);
-	List<Product> findByNameContainingAndCategory( String name, Category Category);
-  Page<Product> findByNameContainingAndCategory( String name, Category Category,Pageable pageable);
+  Optional<Product> findByName(String name);
 
-    List<Product> findByNameAndCategory( String name, Category Category);
+  List<Product> findByNameContaining(String name);
 
-	void delete(Product product);
+  Page<Product> findByNameContaining(String name, Pageable pageable);
 
-	List<Product> findByCategory(Category Category);
+  List<Product> findAllByPrice(double price);
+
+  Page<Product> findAllByPrice(double price, Pageable pageable);
+
+  List<Product> findByNameContainingAndCategory(String name, Category Category);
+
+  Page<Product> findByNameContainingAndCategory(String name, Category Category, Pageable pageable);
+
+  List<Product> findByNameAndCategory(String name, Category Category);
+
+  void delete(Product product);
+
+  List<Product> findByCategory(Category Category);
 
 }

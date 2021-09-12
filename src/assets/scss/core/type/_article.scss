@@ -1,22 +1,24 @@
 //
 // Article
-// 
+//
 
 article {
-	h4:not(:first-child),
-	h5:not(:first-child) {
-		margin-top: 3rem;
-	}
 
-	h4, h5 {
-		margin-bottom: 1.5rem;
-	}
+  h4:not(:first-child),
+  h5:not(:first-child) {
+    margin-top: 3rem;
+  }
 
-	figure {
-		margin: 3rem 0;
-	}
+  h4,
+  h5 {
+    margin-bottom: 1.5rem;
+  }
 
-	h5 + figure {
-		margin-top: 0;
-	}
+  figure {
+    margin: 3rem 0;
+  }
+
+  h5+figure {
+    margin-top: 0;
+  }
 }

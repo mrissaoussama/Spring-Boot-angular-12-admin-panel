@@ -1,39 +1,36 @@
-import { AuthService } from './../../_services/auth.service';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ProductService } from 'src/app/_services/product.service';
-import { TokenStorageService } from 'src/app/_services/token-storage.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { ProductformComponent } from 'src/app/modal/productform/productform.component';
-import { MatPaginator } from '@angular/material/paginator';
-import { CategoryformComponent } from 'src/app/modal/categoryform/categoryform.component';
+import { Router } from '@angular/router';
 import { User } from 'src/app/models/user';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
+import { AuthService } from './../../_services/auth.service';
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
-  columnsToDisplay = ["id","username","fullname","email","status","roles","action"];
-  users:User[]
+  columnsToDisplay = ["id", "username", "fullname", "email", "status", "roles", "action"];
+  users: User[] = null;
   dataSource: MatTableDataSource<User> = null;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private token: TokenStorageService,private authService:AuthService) { }
+  constructor(private token: TokenStorageService, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
-    this.getallusers()
+    if (!this.token.isAdmin()) {
+      this.token.signOut();
+    }
+    this.getAllUsers()
   }
-  getallusers() {
-    this.authService.getallusers().subscribe(
+  getAllUsers() {
+    this.authService.getAllUsers().subscribe(
       data => {
-        console.log(data)
         this.users = data.users;
-        console.log(this.users);
         this.dataSource = new MatTableDataSource(this.users);
         setTimeout(() => {
           this.dataSource.sort = this.sort;
@@ -45,20 +42,17 @@ export class UsersComponent implements OnInit {
       }
     );
   }
-  public doFilter = (value: string,type:String) => {
-    switch (type)
-    {
-    case 'user':
-    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  public doFilter = (value: string, type: String) => {
+    switch (type) {
+      case 'user':
+        this.dataSource.filter = value.trim().toLocaleLowerCase();
 
     }
   }
-  deleteuser(user:User): any {
-    console.log(user)
-    this.authService.deleteuser(user).subscribe(
+  deleteUser(user: User): any {
+    this.authService.deleteUser(user).subscribe(
       data => {
-        console.log(data)
-        this.getallusers()
+        this.getAllUsers()
       },
       err => {
         console.log(err);

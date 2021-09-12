@@ -8,9 +8,9 @@ describe('BoardAdminComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BoardAdminComponent ]
+      declarations: [BoardAdminComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

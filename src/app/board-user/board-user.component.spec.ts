@@ -8,9 +8,9 @@ describe('BoardUserComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BoardUserComponent ]
+      declarations: [BoardUserComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

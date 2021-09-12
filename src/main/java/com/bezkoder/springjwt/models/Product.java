@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.models;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,8 @@ import javax.validation.constraints.Size;
 
 import com.bezkoder.springjwt.payload.request.ProductRequest;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.lang.Nullable;
 
 import lombok.Getter;
@@ -29,10 +32,11 @@ public class Product {
   @Size(max = 20)
   private String name;
   @Nullable
-  private String description="";
+  private String description = "";
   private Float price;
   @Nullable
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Category category;
 
   @Nullable
@@ -75,7 +79,6 @@ public class Product {
 
   }
 
-
   public Product() {
   }
 
@@ -95,6 +98,5 @@ public class Product {
     this.price = price;
 
   }
-
 
 }

@@ -1,9 +1,9 @@
 import { Category } from './../../models/category.model';
 import { ProductService } from './../../_services/product.service';
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Product } from 'src/app/models/product.model';
-import { MatDialog} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSelect } from '@angular/material/select';
 @Component({
   selector: 'app-categoryform',
@@ -12,43 +12,39 @@ import { MatSelect } from '@angular/material/select';
 })
 export class CategoryformComponent implements OnInit {
 
-  categories:Category[];
-errors:String="";
+  categories: Category[];
+  errors: String = "";
   constructor(
     public dialogRef: MatDialogRef<CategoryformComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Product,private productservice:ProductService)
-  { }
-getallcategories():any
-{
-  this.productservice.getallcategories().subscribe(
-    data => {
-this.categories=data.categories;
-console.log(this.categories);
-
-},
-    err => {
-      (err);
-    }
-  );
-}
+    @Inject(MAT_DIALOG_DATA) public data: Product, private productservice: ProductService) { }
+  getAllCategories(): any {
+    this.productservice.getAllCategories().subscribe(
+      data => {
+        this.categories = data.categories;
+      },
+      err => {
+        (err);
+      }
+    );
+  }
   onNoClick(): void {
     this.dialogRef.close();
   }
-  validate(data:any):boolean{
-    this.errors=""
+  validate(data: any): boolean {
+    this.errors = ""
 
-    if(this.data.name==null|| this.data.name=="")
-    this.errors+="name must not be empty\n"
-return (this.errors=="")
+    if (this.data.name == null || this.data.name == "")
+      this.errors += "name must not be empty\n"
+    return (this.errors == "")
   }
-  save(data:any):any{
-return this.dialogRef.afterClosed()
+  save(data: any): any {
+    return this.dialogRef.afterClosed()
   }
 
   ngOnInit() {
-    this.getallcategories();
-    if (this.data.name=="")
-    this.data.name=""
+    this.getAllCategories();
+    if (this.data.name == "")
+      this.data.name = ""
 
 
   }

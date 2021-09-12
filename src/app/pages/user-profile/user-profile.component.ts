@@ -4,6 +4,7 @@ import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { FormGroup, FormControl, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { isDevMode } from '@angular/core';
 import { Validators } from '@angular/forms';
+import { User } from 'src/app/models/user';
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
@@ -14,7 +15,6 @@ export class UserProfileComponent implements OnInit {
   confirm_password: boolean;
   currentUser = this.tokenStorage.getUser();
   profileForm = new FormGroup({
-
     password: new FormControl('', [
       Validators.required,
       Validators.minLength(6)]),
@@ -46,10 +46,12 @@ export class UserProfileComponent implements OnInit {
       ;
   }
   ngOnInit(): void {
+    this.fillUserForm();
+    this.profileimg = '/assets/userimages/' + this.currentUser.id + '/profile.jpg';
 
-
+  }
+  public fillUserForm(): void {
     this.profileForm.patchValue({
-
       name: this.currentUser.name,
       age: this.currentUser.age,
       surname: this.currentUser.surname,
@@ -60,24 +62,7 @@ export class UserProfileComponent implements OnInit {
       description: this.currentUser.description,
     });
 
-
-    {
-      this.profileimg = '/assets/userimages/' + this.currentUser.id + '/profile.jpg';
-    }
-
-    console.log('after init');
-    console.log("on profile");
-
-    console.log(this.profileForm.value);
-    console.log("on image");
-
-    console.log(this.imageForm.value);
-    console.log("current");
-
-    console.log(this.currentUser.value);
-
   }
-
 
 
   public onFileChanged(event) {
@@ -85,7 +70,6 @@ export class UserProfileComponent implements OnInit {
     this.imageForm.patchValue({ image: event.target.files[0] });
     if (this.imageForm.get('image').value != null && this.profileForm.get('password').value?.length > 5)
       this.update();
-
   }
 
   update(): void {
@@ -95,9 +79,7 @@ export class UserProfileComponent implements OnInit {
     image.append('image', this.imageForm.get('image').value);
     image.append('username', this.currentUser.username);
     image.append('password', this.profileForm.get('password').value);
-    console.log(image);
-
-    this.authService.updateprofileimage(image).subscribe(
+    this.authService.updateProfileImage(image).subscribe(
       data => {
         this.isSuccessful = true;
         window.location.reload();
@@ -110,36 +92,19 @@ export class UserProfileComponent implements OnInit {
 
 
   onSubmit(): boolean {
-    console.log("on submit");
-    console.log("on profile");
-
-    console.log(this.profileForm.value);
-    console.log("on image");
-
-    console.log(this.imageForm.value);
-    console.log("current");
-
-    console.log(this.currentUser.value);
+    let user: User;
     if (!this.profileForm.valid) {
       this.profileForm.controls['password'].markAsTouched();
       return false;
     }
     {
-      this.authService.update(this.currentUser["id"], this.currentUser["username"], this.profileForm).subscribe(
+      this.authService.updateProfile(this.currentUser["id"], this.currentUser["username"], this.profileForm).subscribe(
         data => {
-          this.tokenStorage.saveToken(data.accessToken);
-          this.tokenStorage.saveUser(data);
+          user = data.user;
+          user.password = this.currentUser["password"];
+          this.tokenStorage.saveUser(user);
           window.location.reload();
-          console.log("after submit");
-          console.log("on profile");
 
-          console.log(this.profileForm.value);
-          console.log("on image");
-
-          console.log(this.imageForm.value);
-          console.log("current");
-
-          console.log(this.currentUser.value);
 
         },
         err => {

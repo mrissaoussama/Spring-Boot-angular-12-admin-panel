@@ -1,3 +1,5 @@
+import { EditshoppingcartComponent } from './../../modal/editshoppingcart/editshoppingcart.component';
+import { Shoppingcart } from './../../models/shoppingcart.model';
 import { InvoiceComponent } from '../../modal/invoice/invoice.component';
 import { Category } from './../../models/category.model';
 import { Product } from './../../models/product.model';
@@ -19,137 +21,148 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./shopping-carts.component.css']
 })
 export class ShoppingCartsComponent implements OnInit {
-  columnsToDisplay = ["id", 'username', "createddate", "shippingdate", "completeddate",'status', "action"];
+  columnsToDisplay = ["id", 'username', "createddate", "shippingdate", "completeddate", 'status', "action"];
   dataSource: MatTableDataSource<any> = null;
-Shoppingcarts:any[]=[];
+  shoppingcarts: Shoppingcart[] = [];
   constructor(public productservice: ProductService, private token: TokenStorageService
     , public dialog: MatDialog) { }
-    @ViewChild(MatSort) sort: MatSort;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
   ngOnInit(): void {
     this.refreshshoppingcarts();
   }
-  getstatus(shoppingcart:any):string
-  {
-  if(shoppingcart.completeddate==null && shoppingcart.shippingdate==null)
-    return "Processing Order"
-
-    if(shoppingcart.completeddate!=null && shoppingcart.shippingdate!=null)
-    return "Completed"
-    if(shoppingcart.shippingdate!=null && shoppingcart.completeddate==null)
-    return "Shipping"
-
+  getstatus(shoppingcart: any): string {
+    if (shoppingcart.completeddate == null && shoppingcart.shippingdate == null)
+      return "Processing Order"
+    if (shoppingcart.completeddate != null && shoppingcart.shippingdate != null)
+      return "Completed"
+    if (shoppingcart.shippingdate != null && shoppingcart.completeddate == null)
+      return "Shipping"
   }
-  shipcart(shoppingcart:any)
-  {
-    this.productservice.setshippingdate(shoppingcart).subscribe(
+  shipcart(shoppingcart: any) {
+    this.productservice.setShippingDate(shoppingcart).subscribe(
       data => {
-        shoppingcart.shippingdate=data.shoppingcart.shippingdate
-this.messagebox("Order Shipped")},
-err=>{
-this.messagebox("couldn't ship order")
-  })}
-  completecart(shoppingcart:any)
-  {
-    this.productservice.setcompleteddate(shoppingcart).subscribe(
+        shoppingcart.shippingdate = data.shoppingcart.shippingdate
+        this.messagebox("Order Shipped")
+      },
+      err => {
+        this.messagebox("couldn't ship order")
+      })
+  }
+  completecart(shoppingcart: any) {
+    this.productservice.setCompletedDate(shoppingcart).subscribe(
       data => {
-
-        shoppingcart.completeddate=data.shoppingcart.completeddate
-this.messagebox("Order Completed")},
-err=>{
-this.messagebox("couldn't complete order")
-  })}
+        shoppingcart.completeddate = data.shoppingcart.completeddate
+        this.messagebox("Order Completed")
+      },
+      err => {
+        this.messagebox("couldn't complete order")
+      })
+  }
   refreshshoppingcarts() {
-    this.productservice.getallshoppingcarts().subscribe(
+    this.productservice.getAllShoppingCarts().subscribe(
       data => {
-        this.Shoppingcarts = data.list;
-        console.log(this.Shoppingcarts);
-        this.dataSource = new MatTableDataSource(this.Shoppingcarts);
+        this.shoppingcarts = data.list;
+        this.dataSource = new MatTableDataSource(this.shoppingcarts);
         setTimeout(() => {
           this.dataSource.sort = this.sort;
           this.dataSource.paginator = this.paginator;
         });
       },
       err => {
-        (err);
+        this.messagebox(err);
       }
     );
   }
-  public doFilter = (value: string,type:String) => {
-    switch (type)
-    {
-    case 'shoppingcart':
-    this.dataSource.filter = value.trim().toLocaleLowerCase();
-
+  public doFilter = (value: string, type: String) => {
+    switch (type) {
+      case 'shoppingcart':
+        this.dataSource.filter = value.trim().toLocaleLowerCase();
     }
   }
-  messagebox(body:string,title?:string)
-{if (title===undefined)
-  title="Notice"
-  const dialogRef = this.dialog.open(MessageboxComponent, {
-    width: '350px',
-    data: {
-      title: title,  body:body
-    }
-  });
-}
-viewshippingcart(shoppingcart:any){
-
-    const dialogRef = this.dialog.open(InvoiceComponent, {
-      panelClass: ['full-screen-modal'],
-      minWidth:"90%",
-
+  messagebox(body: string, title?: string) {
+    if (title === undefined)
+      title = "Notice"
+    const dialogRef = this.dialog.open(MessageboxComponent, {
+      width: '350px',
       data: {
-       shoppingcart
+        title: title, body: body
       }
     });
-
-}
-
-returnorderssincelastweek(orderstatus:string):number{
-  let today=new Date()
-  var lastweek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay()-7);
-  if (orderstatus=="createddate")
-  return this.Shoppingcarts.filter((item: any) =>
-     new Date(item.createddate).getTime() >= lastweek.getTime() &&
-     new Date(item.createddate).getTime() <= today.getTime()
-).length
-if (orderstatus=="shippingdate")
-  return this.Shoppingcarts.filter((item: any) =>
-     new Date(item.shippingdate).getTime() >= lastweek.getTime() &&
-     new Date(item.shippingdate).getTime() <= today.getTime()
-).length
-if (orderstatus=="completeddate")
-  return this.Shoppingcarts.filter((item: any) =>
-     new Date(item.completeddate).getTime() >= lastweek.getTime() &&
-     new Date(item.completeddate).getTime() <= today.getTime()
-).length
-if (orderstatus=="pending")
-  return this.Shoppingcarts.filter((item: any) =>
-     item.shippingdate== null || item.shippingdate==""
-).length
-}
-returnorders(orderstatus:string):number{
-  console.log(orderstatus)
-
-  let today=new Date()
-  if (orderstatus=="createddate")
-  return this.Shoppingcarts.length
-if (orderstatus=="shippingdate")
-  return this.Shoppingcarts.filter((item: any) =>
-  (item.completeddate== null || item.completeddate=="")
-&&    ( item.shippingdate!= null || item.shippingdate!="")
-
-).length
-if (orderstatus=="completeddate")
-  return this.Shoppingcarts.filter((item: any) =>
-  item.completeddate!= null || item.completeddate!=""
-
-).length
-if (orderstatus=="pending")
-  return this.Shoppingcarts.filter((item: any) =>
-     item.shippingdate== null || item.shippingdate==""
-).length
-
-}
+  }
+  viewshoppingcart(shoppingcart: any) {
+    const dialogRef = this.dialog.open(InvoiceComponent, {
+      panelClass: ['full-screen-modal'],
+      minWidth: "90%",
+      data: {
+        shoppingcart
+      }
+    });
+  }
+  editshoppingcart(shoppingcart) {
+    //this.getShoppingCart(shoppingcart)
+    this.openShoppingCartEditor(shoppingcart)
+  }
+  getShoppingCart(shoppingcart) {
+    this.productservice.getShoppingCart(shoppingcart.user).subscribe(
+      data => {
+        shoppingcart = data.shoppingcart
+      },
+      err => {
+        console.log(err)
+      }
+    )
+  }
+  openShoppingCartEditor(shoppingcart) {
+    const dialogRef = this.dialog.open(EditshoppingcartComponent, {
+      panelClass: ['full-screen-modal'],
+      minWidth: "90%",
+      data: {
+        shoppingcart
+      }
+    });
+    dialogRef.afterClosed().subscribe(() => this.refreshshoppingcarts()
+    )
+  }
+  returnorderssincelastweek(orderstatus: string): number {
+    let today = new Date()
+    var lastweek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 7);
+    if (orderstatus == "createddate")
+      return this.shoppingcarts.filter((item: any) =>
+        new Date(item.createddate).getTime() >= lastweek.getTime() &&
+        new Date(item.createddate).getTime() <= today.getTime()
+      ).length
+    if (orderstatus == "shippingdate")
+      return this.shoppingcarts.filter((item: any) =>
+        new Date(item.shippingdate).getTime() >= lastweek.getTime() &&
+        new Date(item.shippingdate).getTime() <= today.getTime()
+      ).length
+    if (orderstatus == "completeddate")
+      return this.shoppingcarts.filter((item: any) =>
+        new Date(item.completeddate).getTime() >= lastweek.getTime() &&
+        new Date(item.completeddate).getTime() <= today.getTime()
+      ).length
+    if (orderstatus == "pending")
+      return this.shoppingcarts.filter((item: any) =>
+        item.shippingdate == null || item.shippingdate == ""
+      ).length
+  }
+  returnorders(orderstatus: string): number {
+    let today = new Date()
+    if (orderstatus == "createddate")
+      return this.shoppingcarts.length
+    if (orderstatus == "shippingdate")
+      return this.shoppingcarts.filter((item: any) =>
+        (item.completeddate == null || item.completeddate == "")
+        && (item.shippingdate != null || item.shippingdate != "")
+      ).length
+    if (orderstatus == "completeddate")
+      return this.shoppingcarts.filter((item: any) =>
+        item.completeddate != null || item.completeddate != ""
+      ).length
+    if (orderstatus == "pending")
+      return this.shoppingcarts.filter((item: any) =>
+        item.shippingdate == null || item.shippingdate == ""
+      ).length
+  }
 }

@@ -1,23 +1,20 @@
 package com.bezkoder.springjwt.payload.response;
 
-import java.util.List;
-
 import com.bezkoder.springjwt.models.User;
 
-import lombok.Data;
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class UserResponse {
+  private String token;
+  private String type = "Bearer";
+  private User user;
 
- private String token;
-	private String type = "Bearer";
-private List<User> users;
-public UserResponse(String jwt, List<User> users) {
-  this.token=jwt;
-this.users=users;
+  public UserResponse(String jwt, User user) {
+    this.token = jwt;
+    this.user = user;
 
-}
-
-
-
-
+  }
 }

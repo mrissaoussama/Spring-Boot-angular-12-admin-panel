@@ -12,34 +12,32 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 @Getter
 @ToString
 @Setter
 @Entity
-@Table(	name = "Category")
+@Table(name = "Category")
 public class Category {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	@NotBlank
-  @Column(unique=true)
+  @NotBlank
+  @Column(unique = true)
   @Size(max = 20)
-	private String name;
+  private String name;
 
+  public Category(String name) {
+    this.name = name;
+  }
 
-	public Category( String name) {
-		this.name = name;
-	}
+  public Category(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 
-
-	public Category(Long id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public Category() {
-	}
-
+  public Category() {
+  }
 
 }
